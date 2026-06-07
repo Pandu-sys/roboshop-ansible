@@ -10,7 +10,7 @@
     package:
       name: mongodb-org 
       state: present 
-  - name: alloq remote connections
+  - name: allow remote connections
     replace: 
         path: /etc/mongod.conf
         regexp: '127.0.0.1'
