@@ -1,11 +1,11 @@
-- name: configure shipping server 
-  hosts: shipping 
+- name: configure shipping server
+  hosts: shipping
   become: yes
   tasks:
-  - name: install maven 
-    package: 
-      name: maven
-      state: present 
+  - name: install maven
+    package:
+      name: "{{ item }}"
+      state: present
     loop:
     - maven
     - mysql
@@ -41,11 +41,21 @@
     command: mvn clean package
     args:
       chdir: /app
-  - name: move shipping jar 
+  - name: move shipping jar
+    command: mv target/shipping-1.0.jar shipping.jar 
+    args:
+      chdir: /app
+  - name: copy shipping service
     template:
       src: shipping.service.j2
-      dest: /etc/systemd/system/shipping.service 
-  - name: load mysql data 
+      dest: /etc/systemd/system/shipping.service
+
+  - name: install python dependencies
+    pip:
+      name: PyMySQL
+      executable: pip3.9
+
+  - name: load mysql data
     community.mysql.mysql_db:
       state: import
       name: all
@@ -56,4 +66,4 @@
     loop:
     - /app/db/schema.sql
     - /app/db/app-user.sql 
-    - /app/db/master-data.sql
+    - /app/db/master-data.sql 
